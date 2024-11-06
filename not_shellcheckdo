@@ -1,0 +1,45 @@
+#!/bin/bash
+
+shellcheckdir="$PWD/shellcheck_tmp-XXX"
+
+create() {
+mktemp -d "$shellcheckdir"
+}
+
+linktarg="https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz"
+
+! which shellcheck && create
+
+dirtarg="$(find "$PWD" -iname "*shellcheck_tmp*")"
+
+cleanup() {
+    rm -vr "$dirtarg" && echo "removed temp dir" 
+}
+
+trap cleanup EXIT >& /dev/null 
+
+
+pushd "$dirtarg" 2>/dev/null || echo "failed to change dirs"
+
+wget "$linktarg" &&
+    tar -xvf ./*xz
+
+userbin="$HOME/bin"
+
+if [[ ! -d "$userbin" ]]; then
+    mkdir -v "$userbin"
+fi
+
+#shellcheck disable=SC2015
+pushd ./*stable 2>/dev/null &&
+    { cp -v shellcheck "$userbin" && echo "succcessfully copied binary"; } || \
+        { echo "failed to copy binary" && exit 1; }
+
+echo "finished manual shellcheck install"
+echo "...now checking for binary access"
+
+#shellcheck disable=SC2015
+which shellcheck && echo "binary installed - success" || { echo "error - at least one install process failed" && \
+    exit 1; }
+
+exit 0
