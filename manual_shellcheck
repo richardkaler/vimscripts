@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#This can be used in a case where the enduser lacks the ability to install packages via package manager such as apt
+#The script simply takes the official shellcheck and downloads it with wget
+#Once wget downloads it, it is then opened via tar and the script copies it to a binary directory in path 
+#... Actually, I simply create the directory... 
+
 shellcheckdir="$PWD/shellcheck_tmp-XXX"
 
 create() {
