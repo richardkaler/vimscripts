@@ -12,9 +12,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 # General Public License for more details.
 
-#CRITICAL NOTE: This version does not attempt to handle situations where the end user lacks access to certain directories such as /etc/ or when the 
-#end user cannot run sudo. I realized how critical a lack of access for those things can be. To solve it, I wrote a modified version of this that 
-#does address those things. 
+#Nov 7, 2024 ... for this edit, I replaced the check for a command using which with '! command -v'
 
 is_user_root () { [ "${EUID:-$(id -u)}" -eq 0 ]; }
 
@@ -40,21 +38,21 @@ logloc="$HOME/tmp/vimsetup.log"
 	echo running script at "$(date)"
 
 #Install vim if it's not already installed
-if ! [[ $(which vim) ]]; then
+if ! command -v vim; then
 	sudo apt-get install vim -y
 else
 	echo vim is already installed
 fi
 
 #install git
-if ! [[ $(which git) ]]; then
+if ! command -v git; then
 	sudo apt-get install git -y
 else
 	echo git is already installed
 fi
 
 #Install curl with force as it was not installing properly prior
-	if ! [[ $(which curl) ]]; then
+	if ! command -v curl; then
 		sudo apt-get install curl -y
 		sleep 1s && wait
 	else
@@ -72,7 +70,7 @@ else
 fi
 
 #Install shellcheck
-#echo "installing shellcheck"
+echo "installing shellcheck"
 sudo apt-get install shellcheck -y
 
 #Install ale
@@ -154,3 +152,23 @@ if exists(\"current_compiler\")
 				:nnoremap <expr> z<esc> 'mz' . v:count . 'o<esc>\`z'
 				" | sudo tee -a /etc/vim/vimrc
 			} | tee -a "$logloc"
+
+#Optional - work in progress. Oct 27, 2024
+#NOTE: this is a fragile config file. DO NOT attempt to source as that process is automatic with shellcheck and vim
+
+#echo '
+#disable=SC2002 #www.shellcheck.net/wiki/SC2002
+#disable=SC2038 #www.shellcheck.net/wiki/SC2038
+#disable=SC2002 #www.shellcheck.net/wiki/SC2002
+#disable=SC2227 #www.shellcheck.net/wiki/SC2227
+#disable=SC2145 #www.shellcheck.net/wiki/SC2145
+#disable=SC2124 #www.shellcheck.net/wiki/SC2124
+#disable=SC2164 #www.shellcheck.net/wiki/SC2164
+#disable=SC2015 #www.shellcheck.net/wiki/SC2015
+#disable=SC2009 #www.shellcheck.net/wiki/SC2009
+#disable=SC2015 #www.shellcheck.net/wiki/SC2015
+#disable=SC2009 #www.shellcheck.net/wiki/SC2009
+#disable=SC2034 #www.shellcheck.net/wiki/SC2034
+#' > ~/.shellcheckrc
+
+
